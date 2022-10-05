@@ -11,6 +11,7 @@ import util.tools as tools
 
 path = os.path.join('data', sys.argv[2])
 address = 'localhost:' + sys.argv[1]
+master = sys.argv[3]
 
 
 class ChunkServer(pb2_grpc.ChunkServerServicer):
@@ -28,10 +29,10 @@ class ChunkServer(pb2_grpc.ChunkServerServicer):
         print(self.datastore)
         print("---------------------------------------------------------")
         print()
-        # TODO: register to master server
+        self.register_to_master()
 
 
-    def Write(self, request, context) -> pb2.Empty:
+    def Write(self, request, context):
         data:bytes = request.data
         cid:str = request.cid
         # write data to a file
@@ -55,6 +56,12 @@ class ChunkServer(pb2_grpc.ChunkServerServicer):
         for cid in self.datastore:
             chunks.append(cid)
         return pb2.StringList(strs=chunks)
+
+
+    def register_to_master(self) -> None:
+        with grpc.insecure_channel(master) as channel:
+            stub = pb2_grpc.MasterServerStub(channel)
+            stub.RegisterPeer(pb2.RegisterRequest(ip=address))
 
 
 def run():

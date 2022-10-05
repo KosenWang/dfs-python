@@ -9,6 +9,7 @@ from model.stripe import Stripe
 
 import util.tools as tools
 import util.erasure_coding as ec
+import util.master_server_command as master_cmd
 
 
 path = os.path.join('data', 'client')
@@ -54,6 +55,10 @@ def blocks_to_stripes(blocks:list, count:int) -> List[Stripe]:
     return stripes
 
 
+def find_master(segment:Segment) -> str:
+    # find master based on segment id
+    return "localhost:8080"
+
 def add_file(filename:str, count:int, m:int, r:int):
     # count: each stripe has count original blocks
     # m : each segment has m original blocks
@@ -77,12 +82,17 @@ def add_file(filename:str, count:int, m:int, r:int):
         # r global parities is also one segment
         segment = Segment()
         for j in range(len(parities[1])):
-            cid = hash.get_hash_value(parities[1][j])
+            cid = tools.get_hash_value(parities[1][j])
             segment.add_parity(Parity(cid, 1, j))
         stripe.add_segment(segment)
+        # add each segment to master server and chunks in each segment to chunk server
+        for segment in stripe.get_segments():
+            master = find_master(segment)
+            sid = master_cmd.add_segment(segment, blocks, parities, master)
+            print(sid)
 
 
 
 if __name__ == "__main__":
     filename = "hello.txt"
-    add_file(filename, 4, 2, 2)
+    add_file(filename, 2, 2, 1)

@@ -13,13 +13,11 @@ service ChunkServer {
 // master server
 service MasterServer {
   rpc RegisterPeer (RegisterRequest) returns (Empty);
-  rpc CheckChunks (Empty) returns (Empty);
   rpc GetFile (String) returns (ChunkList);
   rpc DeleteFile (String) returns (String);
   rpc GetPeers (Number) returns (StringList);
-  rpc NameSpace (NameRequest) returns (Empty);
+  rpc AddSegment (SegmentRequest) returns (Empty);
 }
-
 
 // The request message containing block uuid.
 message ChunkId {
@@ -32,15 +30,16 @@ message WriteRequest {
   bytes data = 2;
 }
 
-
 message RegisterRequest {
   string ip = 1;
 }
 
-message NameRequest {
-  string uuid = 1;
-  repeated string list = 2;
-  int32 cft = 3;
+message SegmentRequest {
+  string sid = 1;
+  repeated string chunks = 2;
+  repeated string parities = 3;
+  repeated string chunk_location = 4;
+  repeated string parity_location = 5;
 }
 
 message ChunkList {

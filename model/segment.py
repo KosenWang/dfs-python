@@ -1,4 +1,5 @@
 
+from typing import List
 from model.chunk import Chunk
 from model.parity import Parity
 import util.tools as tools
@@ -6,8 +7,8 @@ import util.tools as tools
 class Segment():
     def __init__(self) -> None:
         self.sid = ""
-        self.chunks = []
-        self.parities = []
+        self.chunks:List[Chunk] = []
+        self.parities:List[Parity] = []
     
     def add_chunk(self, chunk:Chunk) -> None:
         self.chunks.append(chunk)
@@ -26,3 +27,15 @@ class Segment():
 
     def get_chunk_number(self) -> int:
         return len(self.chunks) + len(self.parities)
+
+    def get_chunks(self) -> List[Chunk]:
+        return self.chunks
+
+    def get_parities(self) -> List[Parity]:
+        return self.parities
+
+    def chunks_to_str(self) -> List[str]:
+        return [chunk.get_cid() for chunk in self.chunks]
+
+    def parities_to_str(self) -> List[str]:
+        return [parity.get_cid() for parity in self.parities]

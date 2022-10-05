@@ -183,11 +183,6 @@ class MasterServerStub(object):
                 request_serializer=dfs__pb2.RegisterRequest.SerializeToString,
                 response_deserializer=dfs__pb2.Empty.FromString,
                 )
-        self.CheckChunks = channel.unary_unary(
-                '/dfs.MasterServer/CheckChunks',
-                request_serializer=dfs__pb2.Empty.SerializeToString,
-                response_deserializer=dfs__pb2.Empty.FromString,
-                )
         self.GetFile = channel.unary_unary(
                 '/dfs.MasterServer/GetFile',
                 request_serializer=dfs__pb2.String.SerializeToString,
@@ -203,9 +198,9 @@ class MasterServerStub(object):
                 request_serializer=dfs__pb2.Number.SerializeToString,
                 response_deserializer=dfs__pb2.StringList.FromString,
                 )
-        self.NameSpace = channel.unary_unary(
-                '/dfs.MasterServer/NameSpace',
-                request_serializer=dfs__pb2.NameRequest.SerializeToString,
+        self.AddSegment = channel.unary_unary(
+                '/dfs.MasterServer/AddSegment',
+                request_serializer=dfs__pb2.SegmentRequest.SerializeToString,
                 response_deserializer=dfs__pb2.Empty.FromString,
                 )
 
@@ -215,12 +210,6 @@ class MasterServerServicer(object):
     """
 
     def RegisterPeer(self, request, context):
-        """Missing associated documentation comment in .proto file."""
-        context.set_code(grpc.StatusCode.UNIMPLEMENTED)
-        context.set_details('Method not implemented!')
-        raise NotImplementedError('Method not implemented!')
-
-    def CheckChunks(self, request, context):
         """Missing associated documentation comment in .proto file."""
         context.set_code(grpc.StatusCode.UNIMPLEMENTED)
         context.set_details('Method not implemented!')
@@ -244,7 +233,7 @@ class MasterServerServicer(object):
         context.set_details('Method not implemented!')
         raise NotImplementedError('Method not implemented!')
 
-    def NameSpace(self, request, context):
+    def AddSegment(self, request, context):
         """Missing associated documentation comment in .proto file."""
         context.set_code(grpc.StatusCode.UNIMPLEMENTED)
         context.set_details('Method not implemented!')
@@ -256,11 +245,6 @@ def add_MasterServerServicer_to_server(servicer, server):
             'RegisterPeer': grpc.unary_unary_rpc_method_handler(
                     servicer.RegisterPeer,
                     request_deserializer=dfs__pb2.RegisterRequest.FromString,
-                    response_serializer=dfs__pb2.Empty.SerializeToString,
-            ),
-            'CheckChunks': grpc.unary_unary_rpc_method_handler(
-                    servicer.CheckChunks,
-                    request_deserializer=dfs__pb2.Empty.FromString,
                     response_serializer=dfs__pb2.Empty.SerializeToString,
             ),
             'GetFile': grpc.unary_unary_rpc_method_handler(
@@ -278,9 +262,9 @@ def add_MasterServerServicer_to_server(servicer, server):
                     request_deserializer=dfs__pb2.Number.FromString,
                     response_serializer=dfs__pb2.StringList.SerializeToString,
             ),
-            'NameSpace': grpc.unary_unary_rpc_method_handler(
-                    servicer.NameSpace,
-                    request_deserializer=dfs__pb2.NameRequest.FromString,
+            'AddSegment': grpc.unary_unary_rpc_method_handler(
+                    servicer.AddSegment,
+                    request_deserializer=dfs__pb2.SegmentRequest.FromString,
                     response_serializer=dfs__pb2.Empty.SerializeToString,
             ),
     }
@@ -307,23 +291,6 @@ class MasterServer(object):
             metadata=None):
         return grpc.experimental.unary_unary(request, target, '/dfs.MasterServer/RegisterPeer',
             dfs__pb2.RegisterRequest.SerializeToString,
-            dfs__pb2.Empty.FromString,
-            options, channel_credentials,
-            insecure, call_credentials, compression, wait_for_ready, timeout, metadata)
-
-    @staticmethod
-    def CheckChunks(request,
-            target,
-            options=(),
-            channel_credentials=None,
-            call_credentials=None,
-            insecure=False,
-            compression=None,
-            wait_for_ready=None,
-            timeout=None,
-            metadata=None):
-        return grpc.experimental.unary_unary(request, target, '/dfs.MasterServer/CheckChunks',
-            dfs__pb2.Empty.SerializeToString,
             dfs__pb2.Empty.FromString,
             options, channel_credentials,
             insecure, call_credentials, compression, wait_for_ready, timeout, metadata)
@@ -380,7 +347,7 @@ class MasterServer(object):
             insecure, call_credentials, compression, wait_for_ready, timeout, metadata)
 
     @staticmethod
-    def NameSpace(request,
+    def AddSegment(request,
             target,
             options=(),
             channel_credentials=None,
@@ -390,8 +357,8 @@ class MasterServer(object):
             wait_for_ready=None,
             timeout=None,
             metadata=None):
-        return grpc.experimental.unary_unary(request, target, '/dfs.MasterServer/NameSpace',
-            dfs__pb2.NameRequest.SerializeToString,
+        return grpc.experimental.unary_unary(request, target, '/dfs.MasterServer/AddSegment',
+            dfs__pb2.SegmentRequest.SerializeToString,
             dfs__pb2.Empty.FromString,
             options, channel_credentials,
             insecure, call_credentials, compression, wait_for_ready, timeout, metadata)
