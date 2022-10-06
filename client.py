@@ -2,10 +2,10 @@ import os
 from typing import List
 
 from config.global_config import CHUNK_SIZE
-from model.chunk import Chunk
-from model.parity import Parity
+from model.chunk import Chunk, Parity
 from model.segment import Segment
 from model.stripe import Stripe
+from model.file import File
 
 import util.tools as tools
 import util.erasure_coding as ec
@@ -55,16 +55,13 @@ def blocks_to_stripes(blocks:list, count:int) -> List[Stripe]:
     return stripes
 
 
-def find_master(segment:Segment) -> str:
-    # find master based on segment id
-    return "localhost:8080"
-
 def add_file(filename:str, count:int, m:int, r:int):
     # count: each stripe has count original blocks
     # m : each segment has m original blocks
     # r : the number of global parity chunks 
     blocks = file_to_blocks(filename)
     stripes = blocks_to_stripes(blocks, count)
+    file = File()
     for stripe in stripes:
         # data blocks [[block list of local parity], [block list of global parity]]
         parities = ec.encode(m, r, stripe, blocks)
@@ -77,22 +74,43 @@ def add_file(filename:str, count:int, m:int, r:int):
                 segment.add_chunk(chunks[i * m + j])
             # add parity chunks
             cid = tools.get_hash_value(parities[0][i])
-            segment.add_parity(Parity(cid, 0, i))
+            segment.add_parity(Parity(cid, i, 0))
             stripe.add_segment(segment)
         # r global parities is also one segment
         segment = Segment()
         for j in range(len(parities[1])):
             cid = tools.get_hash_value(parities[1][j])
-            segment.add_parity(Parity(cid, 1, j))
+            segment.add_parity(Parity(cid, j, 1))
         stripe.add_segment(segment)
+        file.add_stripe(stripe)
         # add each segment to master server and chunks in each segment to chunk server
-        for segment in stripe.get_segments():
-            master = find_master(segment)
-            sid = master_cmd.add_segment(segment, blocks, parities, master)
-            print(sid)
+        master_cmd.add_stripe(stripe, blocks, parities)
+    print(f'added {file.get_fid()} {filename}')
+    return file
+
+
+def get_file(file:File) -> bytes:
+    stripes = file.get_stripes()
+    data = bytes()
+    try:
+        for stripe in stripes:
+            raw_data = master_cmd.get_stripe(stripe)
+            data += ec.decode(stripe, raw_data)
+        print(data)
+    except Exception:
+        print("Get file failed")
+
+
+def delete_file(file:File) -> str:
+    stripes = file.get_stripes()
+    for stripe in stripes:
+        master_cmd.delete_stripe(stripe)
+    print("Delete file successfully")
 
 
 
 if __name__ == "__main__":
     filename = "hello.txt"
-    add_file(filename, 2, 2, 1)
+    new_file = add_file(filename, 2, 2, 2)
+    get_file(new_file)
+    delete_file(new_file)

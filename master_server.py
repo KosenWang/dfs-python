@@ -1,5 +1,6 @@
 import os
 import sys
+from typing import List
 
 import grpc
 import dfs_pb2 as pb2
@@ -19,7 +20,7 @@ class MasterServer(pb2_grpc.MasterServerServicer):
 
 
     def RegisterPeer(self, request, context):
-        ip_address = request.ip
+        ip_address:str = request.str
         self.peer_table.add(ip_address)
         localtime = tools.get_localtime()
         print(localtime, f"{ip_address} registered to master server.")
@@ -44,13 +45,11 @@ class MasterServer(pb2_grpc.MasterServerServicer):
 
     
     def AddSegment(self, request, context):
-        sid = request.sid
-        chunks = request.chunks
-        parities = request.parities
-        chunk_location = request.chunk_location
-        parity_location = request.parity_location
+        sid:str = request.sid
+        chunks:List[str] = request.chunks
+        locations:List[str] = request.locations
         # add segment name space
-        self.name_space[sid] = (chunks, parities)
+        self.name_space[sid] = chunks
         localtime = tools.get_localtime()
         print(localtime, f"Added segment {sid} to name space.")
         print()
@@ -60,9 +59,10 @@ class MasterServer(pb2_grpc.MasterServerServicer):
         print()
         # add each chunk's location
         for i in range(len(chunks)):
-            self.chunk_table[chunks[i]] = chunk_location[i]
-        for j in range(len(parities)):
-            self.chunk_table[parities[j]] = parity_location[j]
+            cid = chunks[i]
+            # if cid in self.chunk_table:
+            #     self.delete_chunk(cid, self.chunk_table.get(cid))
+            self.chunk_table[cid] = locations[i]
         localtime = tools.get_localtime()
         print(localtime, "Checked current chunk table.")
         print()
@@ -72,6 +72,42 @@ class MasterServer(pb2_grpc.MasterServerServicer):
         print()
         return pb2.Empty()
 
+
+    def GetLocations(self, request, context):
+        sid:str = request.str
+        chunks:List[str] = self.name_space.get(sid, [])
+        locations = []
+        for cid in chunks:
+            locations.append(self.chunk_table.get(cid))
+        return pb2.Locations(locations=locations)
+
+
+    def DeleteSegment(self, request, context):
+        sid:str = request.str
+        chunks:List[str] = self.name_space.get(sid, tuple())
+        for cid in chunks:
+            if cid in self.chunk_table:
+                self.delete_chunk(cid, self.chunk_table.get(cid))
+                self.chunk_table.pop(cid, "Not found")
+        self.name_space.pop(sid, "Not found")
+        localtime = tools.get_localtime()
+        print(localtime, f"Deleted segment {sid} from system.")
+        print()
+        print("--------------------Current Name Space--------------------")
+        print(self.name_space)
+        print("----------------------------------------------------------")
+        print()
+        print("-------------------Current Chunk Table--------------------")
+        print(self.chunk_table)
+        print("----------------------------------------------------------")
+        print()
+        return pb2.Empty()
+
+
+    def delete_chunk(self, cid:str, location:str) -> None:
+        with grpc.insecure_channel(location) as channel:
+            stub = pb2_grpc.ChunkServerStub(channel)
+            stub.Delete(pb2.String(str=cid))
 
 def run():
     server = grpc.server(futures.ThreadPoolExecutor(max_workers=4))

@@ -4,24 +4,19 @@ package dfs;
 
 // The chunk server
 service ChunkServer {
-  rpc Read (ChunkId) returns (Bytes);
+  rpc Read (String) returns (Bytes);
   rpc Write (WriteRequest) returns (Empty);
-  rpc Delete (ChunkId) returns (Empty);
+  rpc Delete (String) returns (Empty);
   rpc GetChunks (Empty) returns (StringList);
 }
 
 // master server
 service MasterServer {
-  rpc RegisterPeer (RegisterRequest) returns (Empty);
-  rpc GetFile (String) returns (ChunkList);
-  rpc DeleteFile (String) returns (String);
+  rpc RegisterPeer (String) returns (Empty);
+  rpc GetLocations (String) returns (Locations);
+  rpc DeleteSegment (String) returns (Empty);
   rpc GetPeers (Number) returns (StringList);
   rpc AddSegment (SegmentRequest) returns (Empty);
-}
-
-// The request message containing block uuid.
-message ChunkId {
-  string cid = 1;
 }
 
 // The request message containing block uuid and data.
@@ -30,22 +25,14 @@ message WriteRequest {
   bytes data = 2;
 }
 
-message RegisterRequest {
-  string ip = 1;
-}
-
 message SegmentRequest {
   string sid = 1;
   repeated string chunks = 2;
-  repeated string parities = 3;
-  repeated string chunk_location = 4;
-  repeated string parity_location = 5;
+  repeated string locations = 3;
 }
 
-message ChunkList {
-  map<string, StringList> map = 1;
-  repeated string chunks = 2;
-  int32 cft = 3;
+message Locations {
+  repeated string locations = 1;
 }
  
 message StringList {

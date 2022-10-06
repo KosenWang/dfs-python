@@ -17,7 +17,7 @@ class ChunkServerStub(object):
         """
         self.Read = channel.unary_unary(
                 '/dfs.ChunkServer/Read',
-                request_serializer=dfs__pb2.ChunkId.SerializeToString,
+                request_serializer=dfs__pb2.String.SerializeToString,
                 response_deserializer=dfs__pb2.Bytes.FromString,
                 )
         self.Write = channel.unary_unary(
@@ -27,7 +27,7 @@ class ChunkServerStub(object):
                 )
         self.Delete = channel.unary_unary(
                 '/dfs.ChunkServer/Delete',
-                request_serializer=dfs__pb2.ChunkId.SerializeToString,
+                request_serializer=dfs__pb2.String.SerializeToString,
                 response_deserializer=dfs__pb2.Empty.FromString,
                 )
         self.GetChunks = channel.unary_unary(
@@ -70,7 +70,7 @@ def add_ChunkServerServicer_to_server(servicer, server):
     rpc_method_handlers = {
             'Read': grpc.unary_unary_rpc_method_handler(
                     servicer.Read,
-                    request_deserializer=dfs__pb2.ChunkId.FromString,
+                    request_deserializer=dfs__pb2.String.FromString,
                     response_serializer=dfs__pb2.Bytes.SerializeToString,
             ),
             'Write': grpc.unary_unary_rpc_method_handler(
@@ -80,7 +80,7 @@ def add_ChunkServerServicer_to_server(servicer, server):
             ),
             'Delete': grpc.unary_unary_rpc_method_handler(
                     servicer.Delete,
-                    request_deserializer=dfs__pb2.ChunkId.FromString,
+                    request_deserializer=dfs__pb2.String.FromString,
                     response_serializer=dfs__pb2.Empty.SerializeToString,
             ),
             'GetChunks': grpc.unary_unary_rpc_method_handler(
@@ -111,7 +111,7 @@ class ChunkServer(object):
             timeout=None,
             metadata=None):
         return grpc.experimental.unary_unary(request, target, '/dfs.ChunkServer/Read',
-            dfs__pb2.ChunkId.SerializeToString,
+            dfs__pb2.String.SerializeToString,
             dfs__pb2.Bytes.FromString,
             options, channel_credentials,
             insecure, call_credentials, compression, wait_for_ready, timeout, metadata)
@@ -145,7 +145,7 @@ class ChunkServer(object):
             timeout=None,
             metadata=None):
         return grpc.experimental.unary_unary(request, target, '/dfs.ChunkServer/Delete',
-            dfs__pb2.ChunkId.SerializeToString,
+            dfs__pb2.String.SerializeToString,
             dfs__pb2.Empty.FromString,
             options, channel_credentials,
             insecure, call_credentials, compression, wait_for_ready, timeout, metadata)
@@ -180,18 +180,18 @@ class MasterServerStub(object):
         """
         self.RegisterPeer = channel.unary_unary(
                 '/dfs.MasterServer/RegisterPeer',
-                request_serializer=dfs__pb2.RegisterRequest.SerializeToString,
+                request_serializer=dfs__pb2.String.SerializeToString,
                 response_deserializer=dfs__pb2.Empty.FromString,
                 )
-        self.GetFile = channel.unary_unary(
-                '/dfs.MasterServer/GetFile',
+        self.GetLocations = channel.unary_unary(
+                '/dfs.MasterServer/GetLocations',
                 request_serializer=dfs__pb2.String.SerializeToString,
-                response_deserializer=dfs__pb2.ChunkList.FromString,
+                response_deserializer=dfs__pb2.Locations.FromString,
                 )
-        self.DeleteFile = channel.unary_unary(
-                '/dfs.MasterServer/DeleteFile',
+        self.DeleteSegment = channel.unary_unary(
+                '/dfs.MasterServer/DeleteSegment',
                 request_serializer=dfs__pb2.String.SerializeToString,
-                response_deserializer=dfs__pb2.String.FromString,
+                response_deserializer=dfs__pb2.Empty.FromString,
                 )
         self.GetPeers = channel.unary_unary(
                 '/dfs.MasterServer/GetPeers',
@@ -215,13 +215,13 @@ class MasterServerServicer(object):
         context.set_details('Method not implemented!')
         raise NotImplementedError('Method not implemented!')
 
-    def GetFile(self, request, context):
+    def GetLocations(self, request, context):
         """Missing associated documentation comment in .proto file."""
         context.set_code(grpc.StatusCode.UNIMPLEMENTED)
         context.set_details('Method not implemented!')
         raise NotImplementedError('Method not implemented!')
 
-    def DeleteFile(self, request, context):
+    def DeleteSegment(self, request, context):
         """Missing associated documentation comment in .proto file."""
         context.set_code(grpc.StatusCode.UNIMPLEMENTED)
         context.set_details('Method not implemented!')
@@ -244,18 +244,18 @@ def add_MasterServerServicer_to_server(servicer, server):
     rpc_method_handlers = {
             'RegisterPeer': grpc.unary_unary_rpc_method_handler(
                     servicer.RegisterPeer,
-                    request_deserializer=dfs__pb2.RegisterRequest.FromString,
+                    request_deserializer=dfs__pb2.String.FromString,
                     response_serializer=dfs__pb2.Empty.SerializeToString,
             ),
-            'GetFile': grpc.unary_unary_rpc_method_handler(
-                    servicer.GetFile,
+            'GetLocations': grpc.unary_unary_rpc_method_handler(
+                    servicer.GetLocations,
                     request_deserializer=dfs__pb2.String.FromString,
-                    response_serializer=dfs__pb2.ChunkList.SerializeToString,
+                    response_serializer=dfs__pb2.Locations.SerializeToString,
             ),
-            'DeleteFile': grpc.unary_unary_rpc_method_handler(
-                    servicer.DeleteFile,
+            'DeleteSegment': grpc.unary_unary_rpc_method_handler(
+                    servicer.DeleteSegment,
                     request_deserializer=dfs__pb2.String.FromString,
-                    response_serializer=dfs__pb2.String.SerializeToString,
+                    response_serializer=dfs__pb2.Empty.SerializeToString,
             ),
             'GetPeers': grpc.unary_unary_rpc_method_handler(
                     servicer.GetPeers,
@@ -290,13 +290,13 @@ class MasterServer(object):
             timeout=None,
             metadata=None):
         return grpc.experimental.unary_unary(request, target, '/dfs.MasterServer/RegisterPeer',
-            dfs__pb2.RegisterRequest.SerializeToString,
+            dfs__pb2.String.SerializeToString,
             dfs__pb2.Empty.FromString,
             options, channel_credentials,
             insecure, call_credentials, compression, wait_for_ready, timeout, metadata)
 
     @staticmethod
-    def GetFile(request,
+    def GetLocations(request,
             target,
             options=(),
             channel_credentials=None,
@@ -306,14 +306,14 @@ class MasterServer(object):
             wait_for_ready=None,
             timeout=None,
             metadata=None):
-        return grpc.experimental.unary_unary(request, target, '/dfs.MasterServer/GetFile',
+        return grpc.experimental.unary_unary(request, target, '/dfs.MasterServer/GetLocations',
             dfs__pb2.String.SerializeToString,
-            dfs__pb2.ChunkList.FromString,
+            dfs__pb2.Locations.FromString,
             options, channel_credentials,
             insecure, call_credentials, compression, wait_for_ready, timeout, metadata)
 
     @staticmethod
-    def DeleteFile(request,
+    def DeleteSegment(request,
             target,
             options=(),
             channel_credentials=None,
@@ -323,9 +323,9 @@ class MasterServer(object):
             wait_for_ready=None,
             timeout=None,
             metadata=None):
-        return grpc.experimental.unary_unary(request, target, '/dfs.MasterServer/DeleteFile',
+        return grpc.experimental.unary_unary(request, target, '/dfs.MasterServer/DeleteSegment',
             dfs__pb2.String.SerializeToString,
-            dfs__pb2.String.FromString,
+            dfs__pb2.Empty.FromString,
             options, channel_credentials,
             insecure, call_credentials, compression, wait_for_ready, timeout, metadata)
 

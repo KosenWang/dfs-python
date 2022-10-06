@@ -58,10 +58,33 @@ class ChunkServer(pb2_grpc.ChunkServerServicer):
         return pb2.StringList(strs=chunks)
 
 
+    def Read(self, request, context):
+        cid:str = request.str
+        dir = os.path.join(path, cid)
+        with open(dir, 'rb') as f:
+            data = f.read()
+        return pb2.Bytes(data=data)
+
+
+    def Delete(self, request, context):
+        cid:str = request.str
+        dir = os.path.join(path, cid)
+        os.remove(dir)
+        self.datastore.remove(cid)
+        localtime = tools.get_localtime()
+        print(localtime, f"Deleted chunk {cid} from datastore.")
+        print()
+        print("--------------------Current Datastore--------------------")
+        print(self.datastore)
+        print("---------------------------------------------------------")
+        print()
+        return pb2.Empty()
+
+
     def register_to_master(self) -> None:
         with grpc.insecure_channel(master) as channel:
             stub = pb2_grpc.MasterServerStub(channel)
-            stub.RegisterPeer(pb2.RegisterRequest(ip=address))
+            stub.RegisterPeer(pb2.String(str=address))
 
 
 def run():

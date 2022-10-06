@@ -7,3 +7,10 @@ def add_chunk(cid:str, data:bytes, location:str) -> None:
     with grpc.insecure_channel(location) as channel:
         stub = pb2_grpc.ChunkServerStub(channel)
         stub.Write(pb2.WriteRequest(cid=cid, data=data))
+
+def get_chunk(cid:str, location:str) -> bytes:
+    # get chunk data from chunk server
+    with grpc.insecure_channel(location) as channel:
+        stub = pb2_grpc.ChunkServerStub(channel)
+        response = stub.Read(pb2.String(str=cid))
+    return response.data
