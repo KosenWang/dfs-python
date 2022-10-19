@@ -2,7 +2,7 @@ import os
 from typing import List
 
 from config.global_config import CHUNK_SIZE
-from model.chunk import Chunk, Parity
+from model.chunk import Chunk
 from model.segment import Segment
 from model.stripe import Stripe
 from model.file import File
@@ -36,7 +36,7 @@ def file_to_blocks(filename:str) -> List[bytes]:
     return blocks
 
 
-def blocks_to_stripes(blocks:list, count:int) -> List[Stripe]:
+def blocks_to_stripes(blocks:list, count:int) -> List[List[bytes]]:
     # combine each m blocks to a fix-sized stripe
     # ready to EC backup
     stripes = []
@@ -44,12 +44,11 @@ def blocks_to_stripes(blocks:list, count:int) -> List[Stripe]:
     n = len(blocks)
     while index < n:
         # each stripe has m blocks
-        stripe = Stripe()
+        stripe:List[bytes] = []
         for i in range(count):
             if index + i >= n:
                 break
-            cid = tools.get_hash_value(blocks[index + i])
-            stripe.add_chunk(Chunk(cid, index + i))
+            stripe.append(blocks[index + i])
         stripes.append(stripe)
         index += count
     return stripes
@@ -62,40 +61,31 @@ def add_file(filename:str, count:int, m:int, r:int):
     blocks = file_to_blocks(filename)
     stripes = blocks_to_stripes(blocks, count)
     file = File()
-    for stripe in stripes:
-        # data blocks [[block list of local parity], [block list of global parity]]
-        parities = ec.encode(m, r, stripe, blocks)
-        chunks = stripe.get_chunks()
+    for tmp in stripes:
+        # data blocks [[block list of chunks]]
+        segs = ec.encode(m, r, tmp)
+        stripe = Stripe()
         # m blocks and 1 local parity is one segment
-        for i in range(len(parities[0])):
+        for i in range(len(segs)):
             segment = Segment()
-            # add original chunks
-            for j in range(m):
-                segment.add_chunk(chunks[i * m + j])
-            # add parity chunks
-            cid = tools.get_hash_value(parities[0][i])
-            segment.add_parity(Parity(cid, i, 0))
+            for j in range(len(segs[i])):
+                # add chunk
+                cid = tools.get_hash_value(segs[i][j])
+                segment.add_chunk(Chunk(cid, i, j))
             stripe.add_segment(segment)
-        # r global parities is also one segment
-        segment = Segment()
-        for j in range(len(parities[1])):
-            cid = tools.get_hash_value(parities[1][j])
-            segment.add_parity(Parity(cid, j, 1))
-        stripe.add_segment(segment)
         file.add_stripe(stripe)
         # add each segment to master server and chunks in each segment to chunk server
-        master_cmd.add_stripe(stripe, blocks, parities)
+        master_cmd.add_stripe(stripe, segs)
     print(f'added {file.get_fid()} {filename}')
     return file
 
 
-def get_file(file:File) -> bytes:
+def get_file(file:File, r:int) -> bytes:
     stripes = file.get_stripes()
     data = bytes()
     try:
         for stripe in stripes:
-            raw_data = master_cmd.get_stripe(stripe)
-            data += ec.decode(stripe, raw_data)
+            data += master_cmd.get_stripe(stripe, r)
         print(data)
     except Exception:
         print("Get file failed")
@@ -112,5 +102,5 @@ def delete_file(file:File) -> str:
 if __name__ == "__main__":
     filename = "hello.txt"
     new_file = add_file(filename, 2, 2, 2)
-    get_file(new_file)
+    get_file(new_file, 2)
     delete_file(new_file)

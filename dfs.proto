@@ -13,7 +13,7 @@ service ChunkServer {
 // master server
 service MasterServer {
   rpc RegisterPeer (String) returns (Empty);
-  rpc GetLocations (String) returns (Locations);
+  rpc GetLocations (String) returns (StringList);
   rpc DeleteSegment (String) returns (Empty);
   rpc GetPeers (Number) returns (StringList);
   rpc AddSegment (SegmentRequest) returns (Empty);
@@ -29,10 +29,6 @@ message SegmentRequest {
   string sid = 1;
   repeated string chunks = 2;
   repeated string locations = 3;
-}
-
-message Locations {
-  repeated string locations = 1;
 }
  
 message StringList {

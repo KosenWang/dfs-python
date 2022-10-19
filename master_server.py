@@ -1,4 +1,3 @@
-import os
 import sys
 from typing import List
 
@@ -33,7 +32,7 @@ class MasterServer(pb2_grpc.MasterServerServicer):
 
 
     def GetPeers(self, request, context):
-        num = request.num
+        num:int = request.num
         peers = []
         count = 0
         for peer in self.peer_table:
@@ -79,7 +78,7 @@ class MasterServer(pb2_grpc.MasterServerServicer):
         locations = []
         for cid in chunks:
             locations.append(self.chunk_table.get(cid))
-        return pb2.Locations(locations=locations)
+        return pb2.StringList(strs=locations)
 
 
     def DeleteSegment(self, request, context):
@@ -108,6 +107,8 @@ class MasterServer(pb2_grpc.MasterServerServicer):
         with grpc.insecure_channel(location) as channel:
             stub = pb2_grpc.ChunkServerStub(channel)
             stub.Delete(pb2.String(str=cid))
+
+
 
 def run():
     server = grpc.server(futures.ThreadPoolExecutor(max_workers=4))

@@ -186,7 +186,7 @@ class MasterServerStub(object):
         self.GetLocations = channel.unary_unary(
                 '/dfs.MasterServer/GetLocations',
                 request_serializer=dfs__pb2.String.SerializeToString,
-                response_deserializer=dfs__pb2.Locations.FromString,
+                response_deserializer=dfs__pb2.StringList.FromString,
                 )
         self.DeleteSegment = channel.unary_unary(
                 '/dfs.MasterServer/DeleteSegment',
@@ -250,7 +250,7 @@ def add_MasterServerServicer_to_server(servicer, server):
             'GetLocations': grpc.unary_unary_rpc_method_handler(
                     servicer.GetLocations,
                     request_deserializer=dfs__pb2.String.FromString,
-                    response_serializer=dfs__pb2.Locations.SerializeToString,
+                    response_serializer=dfs__pb2.StringList.SerializeToString,
             ),
             'DeleteSegment': grpc.unary_unary_rpc_method_handler(
                     servicer.DeleteSegment,
@@ -308,7 +308,7 @@ class MasterServer(object):
             metadata=None):
         return grpc.experimental.unary_unary(request, target, '/dfs.MasterServer/GetLocations',
             dfs__pb2.String.SerializeToString,
-            dfs__pb2.Locations.FromString,
+            dfs__pb2.StringList.FromString,
             options, channel_credentials,
             insecure, call_credentials, compression, wait_for_ready, timeout, metadata)
 
