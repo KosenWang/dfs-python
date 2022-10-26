@@ -23,7 +23,7 @@ class ChunkServerStub(object):
         self.Write = channel.unary_unary(
                 '/dfs.ChunkServer/Write',
                 request_serializer=dfs__pb2.WriteRequest.SerializeToString,
-                response_deserializer=dfs__pb2.Empty.FromString,
+                response_deserializer=dfs__pb2.Bool.FromString,
                 )
         self.Delete = channel.unary_unary(
                 '/dfs.ChunkServer/Delete',
@@ -76,7 +76,7 @@ def add_ChunkServerServicer_to_server(servicer, server):
             'Write': grpc.unary_unary_rpc_method_handler(
                     servicer.Write,
                     request_deserializer=dfs__pb2.WriteRequest.FromString,
-                    response_serializer=dfs__pb2.Empty.SerializeToString,
+                    response_serializer=dfs__pb2.Bool.SerializeToString,
             ),
             'Delete': grpc.unary_unary_rpc_method_handler(
                     servicer.Delete,
@@ -129,7 +129,7 @@ class ChunkServer(object):
             metadata=None):
         return grpc.experimental.unary_unary(request, target, '/dfs.ChunkServer/Write',
             dfs__pb2.WriteRequest.SerializeToString,
-            dfs__pb2.Empty.FromString,
+            dfs__pb2.Bool.FromString,
             options, channel_credentials,
             insecure, call_credentials, compression, wait_for_ready, timeout, metadata)
 
@@ -193,15 +193,10 @@ class MasterServerStub(object):
                 request_serializer=dfs__pb2.String.SerializeToString,
                 response_deserializer=dfs__pb2.Empty.FromString,
                 )
-        self.GetPeers = channel.unary_unary(
-                '/dfs.MasterServer/GetPeers',
-                request_serializer=dfs__pb2.Number.SerializeToString,
-                response_deserializer=dfs__pb2.StringList.FromString,
-                )
         self.AddSegment = channel.unary_unary(
                 '/dfs.MasterServer/AddSegment',
                 request_serializer=dfs__pb2.SegmentRequest.SerializeToString,
-                response_deserializer=dfs__pb2.Empty.FromString,
+                response_deserializer=dfs__pb2.StringList.FromString,
                 )
 
 
@@ -222,12 +217,6 @@ class MasterServerServicer(object):
         raise NotImplementedError('Method not implemented!')
 
     def DeleteSegment(self, request, context):
-        """Missing associated documentation comment in .proto file."""
-        context.set_code(grpc.StatusCode.UNIMPLEMENTED)
-        context.set_details('Method not implemented!')
-        raise NotImplementedError('Method not implemented!')
-
-    def GetPeers(self, request, context):
         """Missing associated documentation comment in .proto file."""
         context.set_code(grpc.StatusCode.UNIMPLEMENTED)
         context.set_details('Method not implemented!')
@@ -257,15 +246,10 @@ def add_MasterServerServicer_to_server(servicer, server):
                     request_deserializer=dfs__pb2.String.FromString,
                     response_serializer=dfs__pb2.Empty.SerializeToString,
             ),
-            'GetPeers': grpc.unary_unary_rpc_method_handler(
-                    servicer.GetPeers,
-                    request_deserializer=dfs__pb2.Number.FromString,
-                    response_serializer=dfs__pb2.StringList.SerializeToString,
-            ),
             'AddSegment': grpc.unary_unary_rpc_method_handler(
                     servicer.AddSegment,
                     request_deserializer=dfs__pb2.SegmentRequest.FromString,
-                    response_serializer=dfs__pb2.Empty.SerializeToString,
+                    response_serializer=dfs__pb2.StringList.SerializeToString,
             ),
     }
     generic_handler = grpc.method_handlers_generic_handler(
@@ -330,23 +314,6 @@ class MasterServer(object):
             insecure, call_credentials, compression, wait_for_ready, timeout, metadata)
 
     @staticmethod
-    def GetPeers(request,
-            target,
-            options=(),
-            channel_credentials=None,
-            call_credentials=None,
-            insecure=False,
-            compression=None,
-            wait_for_ready=None,
-            timeout=None,
-            metadata=None):
-        return grpc.experimental.unary_unary(request, target, '/dfs.MasterServer/GetPeers',
-            dfs__pb2.Number.SerializeToString,
-            dfs__pb2.StringList.FromString,
-            options, channel_credentials,
-            insecure, call_credentials, compression, wait_for_ready, timeout, metadata)
-
-    @staticmethod
     def AddSegment(request,
             target,
             options=(),
@@ -359,6 +326,6 @@ class MasterServer(object):
             metadata=None):
         return grpc.experimental.unary_unary(request, target, '/dfs.MasterServer/AddSegment',
             dfs__pb2.SegmentRequest.SerializeToString,
-            dfs__pb2.Empty.FromString,
+            dfs__pb2.StringList.FromString,
             options, channel_credentials,
             insecure, call_credentials, compression, wait_for_ready, timeout, metadata)

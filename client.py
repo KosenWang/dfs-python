@@ -85,8 +85,9 @@ def get_file(file:File, r:int) -> bytes:
     data = bytes()
     try:
         for stripe in stripes:
-            data += master_cmd.get_stripe(stripe, r)
-        print(data)
+            data += master_cmd.get_stripe(stripe)
+        print(f'get file {file.get_fid()}')
+        print(f'data: {data}')
     except Exception:
         print("Get file failed")
 
@@ -95,12 +96,14 @@ def delete_file(file:File) -> str:
     stripes = file.get_stripes()
     for stripe in stripes:
         master_cmd.delete_stripe(stripe)
-    print("Delete file successfully")
+    print(f"Deleted file {file.get_fid()}")
 
 
 
 if __name__ == "__main__":
     filename = "hello.txt"
-    new_file = add_file(filename, 2, 2, 2)
-    get_file(new_file, 2)
-    delete_file(new_file)
+    file = add_file(filename, 2, 2, 2)
+    print('-------------------------------------')
+    get_file(file, 2)
+    print('-------------------------------------')
+    delete_file(file)

@@ -19,7 +19,7 @@ DESCRIPTOR = _descriptor.FileDescriptor(
   syntax='proto3',
   serialized_options=None,
   create_key=_descriptor._internal_create_key,
-  serialized_pb=b'\n\tdfs.proto\x12\x03\x64\x66s\")\n\x0cWriteRequest\x12\x0b\n\x03\x63id\x18\x01 \x01(\t\x12\x0c\n\x04\x64\x61ta\x18\x02 \x01(\x0c\"@\n\x0eSegmentRequest\x12\x0b\n\x03sid\x18\x01 \x01(\t\x12\x0e\n\x06\x63hunks\x18\x02 \x03(\t\x12\x11\n\tlocations\x18\x03 \x03(\t\"\x1a\n\nStringList\x12\x0c\n\x04strs\x18\x01 \x03(\t\"\x15\n\x06Number\x12\x0b\n\x03num\x18\x01 \x01(\x05\"\x15\n\x05\x42ytes\x12\x0c\n\x04\x64\x61ta\x18\x01 \x01(\x0c\"\x15\n\x06String\x12\x0b\n\x03str\x18\x01 \x01(\t\"\x16\n\x04\x42ool\x12\x0e\n\x06verify\x18\x01 \x01(\x08\"\x07\n\x05\x45mpty2\xa3\x01\n\x0b\x43hunkServer\x12\x1f\n\x04Read\x12\x0b.dfs.String\x1a\n.dfs.Bytes\x12&\n\x05Write\x12\x11.dfs.WriteRequest\x1a\n.dfs.Empty\x12!\n\x06\x44\x65lete\x12\x0b.dfs.String\x1a\n.dfs.Empty\x12(\n\tGetChunks\x12\n.dfs.Empty\x1a\x0f.dfs.StringList2\xe8\x01\n\x0cMasterServer\x12\'\n\x0cRegisterPeer\x12\x0b.dfs.String\x1a\n.dfs.Empty\x12,\n\x0cGetLocations\x12\x0b.dfs.String\x1a\x0f.dfs.StringList\x12(\n\rDeleteSegment\x12\x0b.dfs.String\x1a\n.dfs.Empty\x12(\n\x08GetPeers\x12\x0b.dfs.Number\x1a\x0f.dfs.StringList\x12-\n\nAddSegment\x12\x13.dfs.SegmentRequest\x1a\n.dfs.Emptyb\x06proto3'
+  serialized_pb=b'\n\tdfs.proto\x12\x03\x64\x66s\")\n\x0cWriteRequest\x12\x0b\n\x03\x63id\x18\x01 \x01(\t\x12\x0c\n\x04\x64\x61ta\x18\x02 \x01(\x0c\"-\n\x0eSegmentRequest\x12\x0b\n\x03sid\x18\x01 \x01(\t\x12\x0e\n\x06\x63hunks\x18\x02 \x03(\t\"\x1a\n\nStringList\x12\x0c\n\x04strs\x18\x01 \x03(\t\"\x15\n\x05\x42ytes\x12\x0c\n\x04\x64\x61ta\x18\x01 \x01(\x0c\"\x15\n\x06String\x12\x0b\n\x03str\x18\x01 \x01(\t\"\x16\n\x04\x42ool\x12\x0e\n\x06verify\x18\x01 \x01(\x08\"\x07\n\x05\x45mpty2\xa2\x01\n\x0b\x43hunkServer\x12\x1f\n\x04Read\x12\x0b.dfs.String\x1a\n.dfs.Bytes\x12%\n\x05Write\x12\x11.dfs.WriteRequest\x1a\t.dfs.Bool\x12!\n\x06\x44\x65lete\x12\x0b.dfs.String\x1a\n.dfs.Empty\x12(\n\tGetChunks\x12\n.dfs.Empty\x1a\x0f.dfs.StringList2\xc3\x01\n\x0cMasterServer\x12\'\n\x0cRegisterPeer\x12\x0b.dfs.String\x1a\n.dfs.Empty\x12,\n\x0cGetLocations\x12\x0b.dfs.String\x1a\x0f.dfs.StringList\x12(\n\rDeleteSegment\x12\x0b.dfs.String\x1a\n.dfs.Empty\x12\x32\n\nAddSegment\x12\x13.dfs.SegmentRequest\x1a\x0f.dfs.StringListb\x06proto3'
 )
 
 
@@ -86,13 +86,6 @@ _SEGMENTREQUEST = _descriptor.Descriptor(
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
       serialized_options=None, file=DESCRIPTOR,  create_key=_descriptor._internal_create_key),
-    _descriptor.FieldDescriptor(
-      name='locations', full_name='dfs.SegmentRequest.locations', index=2,
-      number=3, type=9, cpp_type=9, label=3,
-      has_default_value=False, default_value=[],
-      message_type=None, enum_type=None, containing_type=None,
-      is_extension=False, extension_scope=None,
-      serialized_options=None, file=DESCRIPTOR,  create_key=_descriptor._internal_create_key),
   ],
   extensions=[
   ],
@@ -106,7 +99,7 @@ _SEGMENTREQUEST = _descriptor.Descriptor(
   oneofs=[
   ],
   serialized_start=61,
-  serialized_end=125,
+  serialized_end=106,
 )
 
 
@@ -137,40 +130,8 @@ _STRINGLIST = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=127,
-  serialized_end=153,
-)
-
-
-_NUMBER = _descriptor.Descriptor(
-  name='Number',
-  full_name='dfs.Number',
-  filename=None,
-  file=DESCRIPTOR,
-  containing_type=None,
-  create_key=_descriptor._internal_create_key,
-  fields=[
-    _descriptor.FieldDescriptor(
-      name='num', full_name='dfs.Number.num', index=0,
-      number=1, type=5, cpp_type=1, label=1,
-      has_default_value=False, default_value=0,
-      message_type=None, enum_type=None, containing_type=None,
-      is_extension=False, extension_scope=None,
-      serialized_options=None, file=DESCRIPTOR,  create_key=_descriptor._internal_create_key),
-  ],
-  extensions=[
-  ],
-  nested_types=[],
-  enum_types=[
-  ],
-  serialized_options=None,
-  is_extendable=False,
-  syntax='proto3',
-  extension_ranges=[],
-  oneofs=[
-  ],
-  serialized_start=155,
-  serialized_end=176,
+  serialized_start=108,
+  serialized_end=134,
 )
 
 
@@ -201,8 +162,8 @@ _BYTES = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=178,
-  serialized_end=199,
+  serialized_start=136,
+  serialized_end=157,
 )
 
 
@@ -233,8 +194,8 @@ _STRING = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=201,
-  serialized_end=222,
+  serialized_start=159,
+  serialized_end=180,
 )
 
 
@@ -265,8 +226,8 @@ _BOOL = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=224,
-  serialized_end=246,
+  serialized_start=182,
+  serialized_end=204,
 )
 
 
@@ -290,14 +251,13 @@ _EMPTY = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=248,
-  serialized_end=255,
+  serialized_start=206,
+  serialized_end=213,
 )
 
 DESCRIPTOR.message_types_by_name['WriteRequest'] = _WRITEREQUEST
 DESCRIPTOR.message_types_by_name['SegmentRequest'] = _SEGMENTREQUEST
 DESCRIPTOR.message_types_by_name['StringList'] = _STRINGLIST
-DESCRIPTOR.message_types_by_name['Number'] = _NUMBER
 DESCRIPTOR.message_types_by_name['Bytes'] = _BYTES
 DESCRIPTOR.message_types_by_name['String'] = _STRING
 DESCRIPTOR.message_types_by_name['Bool'] = _BOOL
@@ -324,13 +284,6 @@ StringList = _reflection.GeneratedProtocolMessageType('StringList', (_message.Me
   # @@protoc_insertion_point(class_scope:dfs.StringList)
   })
 _sym_db.RegisterMessage(StringList)
-
-Number = _reflection.GeneratedProtocolMessageType('Number', (_message.Message,), {
-  'DESCRIPTOR' : _NUMBER,
-  '__module__' : 'dfs_pb2'
-  # @@protoc_insertion_point(class_scope:dfs.Number)
-  })
-_sym_db.RegisterMessage(Number)
 
 Bytes = _reflection.GeneratedProtocolMessageType('Bytes', (_message.Message,), {
   'DESCRIPTOR' : _BYTES,
@@ -369,8 +322,8 @@ _CHUNKSERVER = _descriptor.ServiceDescriptor(
   index=0,
   serialized_options=None,
   create_key=_descriptor._internal_create_key,
-  serialized_start=258,
-  serialized_end=421,
+  serialized_start=216,
+  serialized_end=378,
   methods=[
   _descriptor.MethodDescriptor(
     name='Read',
@@ -388,7 +341,7 @@ _CHUNKSERVER = _descriptor.ServiceDescriptor(
     index=1,
     containing_service=None,
     input_type=_WRITEREQUEST,
-    output_type=_EMPTY,
+    output_type=_BOOL,
     serialized_options=None,
     create_key=_descriptor._internal_create_key,
   ),
@@ -425,8 +378,8 @@ _MASTERSERVER = _descriptor.ServiceDescriptor(
   index=1,
   serialized_options=None,
   create_key=_descriptor._internal_create_key,
-  serialized_start=424,
-  serialized_end=656,
+  serialized_start=381,
+  serialized_end=576,
   methods=[
   _descriptor.MethodDescriptor(
     name='RegisterPeer',
@@ -459,22 +412,12 @@ _MASTERSERVER = _descriptor.ServiceDescriptor(
     create_key=_descriptor._internal_create_key,
   ),
   _descriptor.MethodDescriptor(
-    name='GetPeers',
-    full_name='dfs.MasterServer.GetPeers',
-    index=3,
-    containing_service=None,
-    input_type=_NUMBER,
-    output_type=_STRINGLIST,
-    serialized_options=None,
-    create_key=_descriptor._internal_create_key,
-  ),
-  _descriptor.MethodDescriptor(
     name='AddSegment',
     full_name='dfs.MasterServer.AddSegment',
-    index=4,
+    index=3,
     containing_service=None,
     input_type=_SEGMENTREQUEST,
-    output_type=_EMPTY,
+    output_type=_STRINGLIST,
     serialized_options=None,
     create_key=_descriptor._internal_create_key,
   ),

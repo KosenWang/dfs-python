@@ -5,7 +5,7 @@ package dfs;
 // The chunk server
 service ChunkServer {
   rpc Read (String) returns (Bytes);
-  rpc Write (WriteRequest) returns (Empty);
+  rpc Write (WriteRequest) returns (Bool);
   rpc Delete (String) returns (Empty);
   rpc GetChunks (Empty) returns (StringList);
 }
@@ -15,8 +15,7 @@ service MasterServer {
   rpc RegisterPeer (String) returns (Empty);
   rpc GetLocations (String) returns (StringList);
   rpc DeleteSegment (String) returns (Empty);
-  rpc GetPeers (Number) returns (StringList);
-  rpc AddSegment (SegmentRequest) returns (Empty);
+  rpc AddSegment (SegmentRequest) returns (StringList);
 }
 
 // The request message containing block uuid and data.
@@ -28,15 +27,10 @@ message WriteRequest {
 message SegmentRequest {
   string sid = 1;
   repeated string chunks = 2;
-  repeated string locations = 3;
 }
  
 message StringList {
   repeated string strs = 1;
-}
-
-message Number {
-  int32 num = 1;
 }
 
 message Bytes {

@@ -14,8 +14,8 @@ class Segment():
     def get_sid(self) -> str:
         if len(self.sid) == 0:
             tmp = ""
-            for chunk in self.chunks:
-                tmp += chunk.get_cid()
+            for i in range(self.get_chunk_number() - 1):
+                tmp += self.chunks[i].get_cid()
             self.sid = tools.get_hash_value(tmp.encode('utf-8'))
         return self.sid
 

@@ -35,20 +35,23 @@ class ChunkServer(pb2_grpc.ChunkServerServicer):
     def Write(self, request, context):
         data:bytes = request.data
         cid:str = request.cid
-        # write data to a file
-        dir = os.path.join(path, cid)
-        with open(dir, 'wb') as f:
-            f.write(data)
-        # sync local datastore
-        self.datastore.add(cid)
-        localtime = tools.get_localtime()
-        print(localtime, f"added chunk {cid} to datastore.")
-        print()
-        print("--------------------Current Datastore--------------------")
-        print(self.datastore)
-        print("---------------------------------------------------------")
-        print()
-        return pb2.Empty()
+        if tools.get_hash_value(data) == cid:
+            # write data to a file
+            dir = os.path.join(path, cid)
+            with open(dir, 'wb') as f:
+                f.write(data)
+            # sync local datastore
+            self.datastore.add(cid)
+            localtime = tools.get_localtime()
+            print(localtime, f"added chunk {cid} to datastore.")
+            print()
+            print("--------------------Current Datastore--------------------")
+            print(self.datastore)
+            print("---------------------------------------------------------")
+            print()
+            return pb2.Bool(verify=True)
+        else:
+            return pb2.Bool(verify=False)
 
 
     def GetChunks(self, request, context):

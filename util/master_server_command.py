@@ -20,34 +20,30 @@ def add_stripe(stripe:Stripe, data_blocks:List[bytes]) -> None:
 def add_segment(segment:Segment, data_blocks:List[List[bytes]], master:str) -> None:
     # add one segment to one orgnization
     # k: chunk number in one segment
-    k = segment.get_chunk_number()
     chunks = segment.get_chunks()
     sid = segment.get_sid()
-    peers = get_peers(k, master)
+    # add segment info to master server
+    with grpc.insecure_channel(master) as channel:
+        stub = pb2_grpc.MasterServerStub(channel)
+        response = stub.AddSegment(pb2.SegmentRequest(sid=sid, 
+                                           chunks=segment.flatten_to_str()))
+    peers:List[str] = response.strs
     # add each chunk to chunk server
     index = 0
     for chunk in chunks:
         chunk_cmd.add_chunk(chunk.get_cid(), data_blocks[chunk.get_seg_index()][chunk.get_chunk_index()], peers[index])
         index += 1
-    # add segment info to master server
-    with grpc.insecure_channel(master) as channel:
-        stub = pb2_grpc.MasterServerStub(channel)
-        stub.AddSegment(pb2.SegmentRequest(sid=sid, 
-                                           chunks=segment.flatten_to_str(), 
-                                           locations=peers))
+    
 
-
-def get_stripe(stripe:Stripe, r:int) -> bytes:
-    # m : each segment has m original blocks
-    # r : the number of global parity chunks 
+def get_stripe(stripe:Stripe) -> bytes:
     segments = stripe.get_segments()
     n = len(segments)
     k = stripe.get_chunk_number()
     # [[data of original and local parity chunks],...,[data of global parity chunks]]
-    raw_data = []
-    global_parities = []
+    raw_data:List[bytes] = []
     index = 0
-    indexes = []
+    indexes:List[int] = []
+    # get each data in each segment
     for i in range(n - 1):
         blocks = get_segment(segments[i])
         for j in range(len(blocks)):   
@@ -56,17 +52,22 @@ def get_stripe(stripe:Stripe, r:int) -> bytes:
         index += segments[i].get_chunk_number() - 1
     # local decode failed
     if len(raw_data) != k:
+        # how many original chunks are missing
+        diff = k - len(raw_data)
         # get global parity chunks
-        if len(global_parities) == 0:
-            global_seg = segments[-1]
-            chunks = global_seg.get_chunks()
-            locations = get_locations(global_seg)
-            for j in len(chunks):
-                global_parities.append(chunk_cmd.get_chunk(chunks[j].get_cid(), locations[j]))
-        # add global parity chunk  
-        for parity in global_parities:
-            raw_data.append(parity)
-            indexes.append(index)
+        global_seg = segments[-1]
+        # r : the number of global parity chunks 
+        r = global_seg.get_chunk_number()
+        chunks = global_seg.get_chunks()
+        locations = get_locations(global_seg)
+        for j in range(r):
+            if diff == 0:
+                break
+            data = chunk_cmd.get_chunk(chunks[j].get_cid(), locations[j])
+            if tools.get_hash_value(data) == chunks[j].get_cid():
+                raw_data.append(data)
+                indexes.append(index)
+                diff -= 1
             index += 1
         raw_data = ec.global_decode(raw_data, indexes, r)
     return ec.decode(raw_data)
@@ -92,10 +93,7 @@ def get_segment(segment:Segment) -> List[bytes]:
             blocks.append(local_parity)
             indexes.append(k-1)
             blocks = ec.local_decode(blocks, indexes)
-    if len(blocks) == k - 1:
-        return blocks
-    else:
-        return []
+    return blocks
 
 
 def delete_stripe(stripe:Stripe) -> None:
@@ -112,14 +110,6 @@ def delete_segment(segment:Segment) -> None:
         stub.DeleteSegment(pb2.String(str=sid))
 
 
-def get_peers(k:int, master:str) -> List[str]:
-    # get the ip address of peers which are ready for add file and backup
-    with grpc.insecure_channel(master) as channel:
-        stub = pb2_grpc.MasterServerStub(channel)
-        response = stub.GetPeers(pb2.Number(num=k))
-    return response.strs
-
-
 def get_locations(segment:Segment) -> List[str]:
     # get locations of all chunks in one segment
     master = find_master(segment)
@@ -131,5 +121,8 @@ def get_locations(segment:Segment) -> List[str]:
 
 
 def find_master(segment:Segment) -> str:
-    # find master based on segment id
-    return "localhost:8080"
+    # TODO: find master based on segment id
+    k = segment.get_chunk_number()
+    i = k % 2
+    masters:List[str] = [ "localhost:9090", "localhost:8080"]
+    return masters[i]

@@ -30,23 +30,11 @@ class MasterServer(pb2_grpc.MasterServerServicer):
         print()
         return pb2.Empty()
 
-
-    def GetPeers(self, request, context):
-        num:int = request.num
-        peers = []
-        count = 0
-        for peer in self.peer_table:
-            peers.append(peer)
-            count += 1
-            if count == num:
-                break
-        return pb2.StringList(strs=peers)
-
     
     def AddSegment(self, request, context):
         sid:str = request.sid
         chunks:List[str] = request.chunks
-        locations:List[str] = request.locations
+        locations:List[str] = self.getPeers(len(chunks))
         # add segment name space
         self.name_space[sid] = chunks
         localtime = tools.get_localtime()
@@ -69,7 +57,7 @@ class MasterServer(pb2_grpc.MasterServerServicer):
         print(self.chunk_table)
         print("-----------------------------------------------------------")
         print()
-        return pb2.Empty()
+        return pb2.StringList(strs=locations)
 
 
     def GetLocations(self, request, context):
@@ -83,7 +71,7 @@ class MasterServer(pb2_grpc.MasterServerServicer):
 
     def DeleteSegment(self, request, context):
         sid:str = request.str
-        chunks:List[str] = self.name_space.get(sid, tuple())
+        chunks:List[str] = self.name_space.get(sid, [])
         for cid in chunks:
             if cid in self.chunk_table:
                 self.delete_chunk(cid, self.chunk_table.get(cid))
@@ -102,6 +90,17 @@ class MasterServer(pb2_grpc.MasterServerServicer):
         print()
         return pb2.Empty()
 
+
+    def getPeers(self, num:int) -> List[str]:
+        peers:List[str] = []
+        count = 0
+        for peer in self.peer_table:
+            peers.append(peer)
+            count += 1
+            if count == num:
+                break
+        return peers
+        
 
     def delete_chunk(self, cid:str, location:str) -> None:
         with grpc.insecure_channel(location) as channel:
